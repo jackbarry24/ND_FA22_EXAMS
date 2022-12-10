@@ -2,17 +2,20 @@ import math
 
 #FILL OUT
 ###########################
-WORD_ADDRESSED = True
-BYTE_ADDRESSED = False
+DIRECT_MAPPED = False
+SET_ASSOCIATIVE = True
+
+WORD_ADDRESSED = False
+BYTE_ADDRESSED = True
 
 ADDRESS_SIZE = 32
-ADDRESS = "AABBCCDD"
+ADDRESS = "FAB12389"
 
 BLOCK_COUNT = 4096
-WORD_SIZE = 0
-BLOCK_SIZE = 0
-WORDS_PER_BLOCK = 16
-SET_ASSOCIATIVE_WAYS = 4
+WORD_SIZE = 4
+BLOCK_SIZE = 512
+WORDS_PER_BLOCK = 0
+SET_ASSOCIATIVE_WAYS = 2
 ###########################
 
 def hex_to_bin(hex_str):
@@ -83,19 +86,31 @@ class SetAssociativeCache (Cache):
 
 def main():
     params = [BLOCK_COUNT, WORD_SIZE, BLOCK_SIZE, WORDS_PER_BLOCK]
-    cache = DirectMappedCache(*params)
-    #cache = SetAssociativeCache(*params, SET_ASSOCIATIVE_WAYS)
 
+    if DIRECT_MAPPED:
+        cache = DirectMappedCache(*params)
+    elif SET_ASSOCIATIVE:
+        cache = SetAssociativeCache(*params, SET_ASSOCIATIVE_WAYS)
+    else:
+        print("Error: Cache type not specified")
+        return
+
+    print(cache)
     tag, index, offset = cache.translate(ADDRESS)
-    print("Block: ", index)
+    
+    if DIRECT_MAPPED:
+        print("Block: ", index)
+    elif SET_ASSOCIATIVE:
+        print("Set: ", index)
+
     if WORD_ADDRESSED:
         print("Word: ", offset)
     elif BYTE_ADDRESSED:
         print("Byte: ", offset)
     print("Tag: ", tag)
 
-    size = cache.cache_size(10, 14, 8, 4)
-    print("Cache size: 2^", int(math.log(size, 2)), " bytes")
+    #size = cache.cache_size(10, 14, 8, 4)
+    #print("Cache size: 2^", int(math.log(size, 2)), " bytes")
 
 
 if __name__ == "__main__":
