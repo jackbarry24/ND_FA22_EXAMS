@@ -1,3 +1,4 @@
+
 def seconds_to_ghz(seconds):
     return 1 / (seconds * 10 ** 9)
 
