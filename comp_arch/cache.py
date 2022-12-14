@@ -2,24 +2,25 @@ import math
 
 #FILL OUT
 ###########################
-DIRECT_MAPPED = False
-SET_ASSOCIATIVE = True
+DIRECT_MAPPED = True
+SET_ASSOCIATIVE = False
 
 WORD_ADDRESSED = False
 BYTE_ADDRESSED = True
 
-ADDRESS_SIZE = 32
-ADDRESS = "FAB12389"
+VIRTUAL_ADDRESS_SIZE = 32
+PHYSICAL_ADDRESS_SIZE = 32
+ADDRESS = "0a1204"
 
-BLOCK_COUNT = 4096
-WORD_SIZE = 4
-BLOCK_SIZE = 512
-WORDS_PER_BLOCK = 0
-SET_ASSOCIATIVE_WAYS = 2
+BLOCK_COUNT = 512
+WORD_SIZE = 8
+BLOCK_SIZE = 64
+WORDS_PER_BLOCK = 8
+SET_ASSOCIATIVE_WAYS = 0
 ###########################
 
 def hex_to_bin(hex_str):
-    return bin(int(hex_str, 16))[2:].zfill(ADDRESS_SIZE)
+    return bin(int(hex_str, 16))[2:].zfill(PHYSICAL_ADDRESS_SIZE)
 
 def bin_to_dec(bin_str):
     return int(bin_str, 2)
@@ -41,10 +42,11 @@ class Cache:
             return int(math.log2(self.block_size))
     
     def tag_bits(self):
-        return int(ADDRESS_SIZE - self.index_bits() - self.offset_bits())
+        return int(PHYSICAL_ADDRESS_SIZE - self.index_bits() - self.offset_bits())
 
     def translate(self, hex_address):
         bin_address = hex_to_bin(hex_address)
+        #[tag][index][offset]
         tag = bin_address[:self.tag_bits()]
         index = bin_address[self.tag_bits():self.tag_bits() + self.index_bits()]
         offset = bin_address[self.tag_bits() + self.index_bits():]
@@ -99,14 +101,14 @@ def main():
     tag, index, offset = cache.translate(ADDRESS)
     
     if DIRECT_MAPPED:
-        print("Block: ", index)
+        print("Block: ", index, hex(index), bin(index))
     elif SET_ASSOCIATIVE:
-        print("Set: ", index)
+        print("Set: ", index, hex(index), bin(index))
 
     if WORD_ADDRESSED:
-        print("Word: ", offset)
+        print("Word: ", offset, hex(offset), bin(offset))
     elif BYTE_ADDRESSED:
-        print("Byte: ", offset)
+        print("Byte: ", offset, hex(offset), bin(offset))
     print("Tag: ", tag)
 
     #size = cache.cache_size(10, 14, 8, 4)
